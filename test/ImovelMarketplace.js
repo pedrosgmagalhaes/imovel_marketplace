@@ -1,3 +1,4 @@
+// test/ImovelMarketplace.js
 const { expect } = require("chai");
 
 describe("ImovelMarketplace", function() {
@@ -23,13 +24,10 @@ describe("ImovelMarketplace", function() {
     });
 
     describe("Compra de imoveis", function() {
-        beforeEach(async function() {
-            await imovelMarketplace.listarImovel(1000, 10);
-        });
-
         it("Deve permitir comprar um imovel", async function() {
+            await imovelMarketplace.listarImovel(1000, 10);
             await buyer.sendTransaction({ to: imovelMarketplace.address, value: 1000 });
-            await imovelMarketplace.connect(buyer).comprarImovel(0);
+            await imovelMarketplace.connect(buyer).comprarImovel(0, { value: 1000 });
             const imovel = await imovelMarketplace.imoveis(0);
             expect(imovel.owner).to.equal(buyer.address);
             expect(imovel.isForSale).to.be.false;
@@ -44,12 +42,18 @@ describe("ImovelMarketplace", function() {
         beforeEach(async function() {
             await imovelMarketplace.listarImovel(1000, 10);
         });
-
+    
         it("Deve permitir alugar um imovel", async function() {
-            await renter.sendTransaction({ to: imovelMarketplace.address, value: 10 });
-            await imovelMarketplace.connect(renter).alugarImovel(0, 1);
-            const imovel = await imovelMarketplace.imoveis(0);
-            expect(imovel.alugadoAte).to.be.above(await ethers.provider.getBlockNumber());
+            const imovelId = 0;
+            const dias = 10;
+            
+            const imovelBeforeRent = await imovelMarketplace.imoveis(imovelId);
+            const totalRentCost = imovelBeforeRent.aluguelPorDia * dias;
+    
+            await imovelMarketplace.connect(renter).alugarImovel(imovelId, dias, { value: totalRentCost });
+    
+            const imovelAfterRent = await imovelMarketplace.imoveis(imovelId);
+            expect(imovelAfterRent.alugadoAte).to.be.above(await ethers.provider.getBlockNumber());
         });
     });
 

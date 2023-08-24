@@ -36,7 +36,7 @@ contract ImovelMarketplace {
         require(msg.value == imoveis[id].preco, "Valor enviado incorreto");
         
         imoveis[id].owner.transfer(msg.value);
-        imoveis[id].owner = payable(msg.sender);  // E aqui
+        imoveis[id].owner = payable(msg.sender);
         imoveis[id].isForSale = false;
 
         emit ImovelComprado(id, msg.sender);
@@ -63,4 +63,7 @@ contract ImovelMarketplace {
         require(imoveis[id].owner == msg.sender, "Somente o proprietario pode retirar da venda.");
         imoveis[id].isForSale = false;
     }
+
+    receive() external payable {}
+
 }

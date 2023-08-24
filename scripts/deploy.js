@@ -1,3 +1,5 @@
+// scripts/deploy.js
+
 const hre = require("hardhat");
 
 async function main() {
@@ -6,9 +8,6 @@ async function main() {
 
   await imovelMarketplace.deployed();
 
-  console.log("ImovelMarketplace deployed to:", imovelMarketplace.address);
-
-  // Vamos agora verificar o contrato no Etherscan
   await hre.run("verify:verify", {
     address: imovelMarketplace.address,
     constructorArguments: [],
